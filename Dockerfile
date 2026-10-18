@@ -61,8 +61,12 @@ RUN pip install --no-cache-dir -r requirements/browser.txt
 # Only what the panel imports. `panel/vendor/` rides along inside this one copy: the
 # cloakbrowser helpers and, beside them, the BSD-2 notice clause 2 asks a binary
 # redistribution to reproduce — a published image being one.
+#
+# CONTEXT.md is deliberately not copied: it is not in the repository (upstream neither),
+# and `COPY ... CONTEXT.md` made every build fail with "failed to calculate checksum:
+# /CONTEXT.md: not found". Nothing at runtime reads it.
 COPY panel/ ./panel/
-COPY run.py pytest.ini CONTEXT.md ./
+COPY run.py pytest.ini ./
 COPY --from=spa /build/dist ./frontend/dist
 
 # ADR-0006 says dependencies live inside the project folder. In a container "the project
