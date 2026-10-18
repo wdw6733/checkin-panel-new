@@ -1,13 +1,16 @@
-# The container way to run the panel (ADR-0016).
+# 容器方式运行签到面板 (ADR-0016)。
 #
-#   docker compose up -d && docker compose logs -f
+#   docker compose pull && docker compose up -d && docker compose logs -f
+#
+# 镜像由 GitHub Actions 构建并推到 GHCR（.github/workflows/docker-publish.yml），
+# 服务器上不需要装 node / playwright，也不用本地 build。
+# 想自己构建：`docker compose -f docker-compose.build.yml up -d --build`。
 #
 # Everything worth changing is in `environment` below.
 
 services:
   panel:
-    build: .
-    image: anyrouter-checkin-panel
+    image: ghcr.io/wdw6733/checkin-panel-new:latest
     container_name: checkin-panel
 
     # 127.0.0.1 is deliberate and is the actual trust boundary. There is no login, and
@@ -28,7 +31,9 @@ services:
       # the container itself -- a proxy running on the host is reachable as
       # host.docker.internal (mapped below for Linux, where Docker does not provide it).
       # Leave it unset if the browser should go out directly; HTTP check-ins never use it.
-      CHECKIN_PROXY_URL: http://host.docker.internal:7897
+      #
+      # 7890 是本机 Clash 的默认端口；Clash Verge 是 7897，按你实际用的改。
+      CHECKIN_PROXY_URL: http://host.docker.internal:7890
 
       # "0" turns off the daily loop and leaves 签到 in the UI as the only trigger.
       PANEL_SCHEDULER: "1"

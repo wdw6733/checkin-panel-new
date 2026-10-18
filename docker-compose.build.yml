@@ -1,0 +1,38 @@
+# 本地构建版（可选）。
+#
+#   docker compose -f docker-compose.build.yml up -d --build
+#
+# 平时用 docker-compose.yml 直接拉 GHCR 的镜像就行；这个文件是给「想改代码后立刻
+# 在本地跑一遍」的场景留的，内容与主文件一致，只把 image 换成本地 tag 并打开 build。
+
+services:
+  panel:
+    build: .
+    image: checkin-panel:local
+    container_name: checkin-panel
+
+    # 无鉴权，且 /api/accounts 会明文返回凭据 —— 只绑回环地址。
+    ports:
+      - "127.0.0.1:8000:8000"
+
+    environment:
+      TZ: Asia/Shanghai
+      # 7890 是本机 Clash 的默认端口；Clash Verge 是 7897。
+      CHECKIN_PROXY_URL: http://host.docker.internal:7890
+      PANEL_SCHEDULER: "1"
+      PANEL_PROMO: "1"
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    volumes:
+      - panel-data:/app/data
+      - panel-profiles:/app/.browser_profiles
+      - panel-browser:/app/.local/cloakbrowser
+
+    restart: unless-stopped
+
+volumes:
+  panel-data:
+  panel-profiles:
+  panel-browser:

@@ -5,6 +5,8 @@ sandboxed folder (ADR-0006). An account is identified by (name, base_url); the
 old built-in "provider" table is gone — a site is just its Base URL, and what it
 supports is discovered at run time (see panel/newapi.probe).
 """
+from __future__ import annotations
+
 import shutil
 import sqlite3
 from contextlib import contextmanager
